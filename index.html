@@ -1,38 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Love Letter 💌</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffeef3;
+      text-align: center;
+      padding: 30px 15px;
+      color: #333;
+    }
+
+    .box {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      color: #e91e63;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      box-sizing: border-box;
+      padding: 15px;
+      border: 2px solid #ffc1d3;
+      border-radius: 15px;
+      font-size: 16px;
+      resize: none;
+      outline: none;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 13px 25px;
+      border: none;
+      border-radius: 25px;
+      background: #e91e63;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .letter {
+      background: #fff8fa;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 15px;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 
 <body>
 
-    <h1>Welcome to My Website ❤️</h1>
-    <p>This is my first website!</p>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  <div class="box">
+    <h1>💌 Our Love Letter</h1>
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyB1pwyntiHC8VdGpawC6XjJwKts3Eu-uTQ",
-    authDomain: "youngluv4everr-401fa.firebaseapp.com",
-    projectId: "youngluv4everr-401fa",
-    storageBucket: "youngluv4everr-401fa.firebasestorage.app",
-    messagingSenderId: "1029696388963",
-    appId: "1:1029696388963:web:9357728a2ba8e0fce0dd56",
-    measurementId: "G-RP91725T8M"
-  };
+    <p>Write something from your heart ❤️</p>
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    <textarea id="letter" placeholder="Type your letter here..."></textarea>
+
+    <br>
+
+    <button id="sendBtn">Send Letter 💌</button>
+
+    <p id="status"></p>
+
+    <div id="letters"></div>
+  </div>
+
+
+  <script type="module">
+
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+    import {
+      getDatabase,
+      ref,
+      push,
+      onValue
+    }
+    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1pwyntiHC8VdGpawC6XjJwKts3Eu-uTQ",
+      authDomain: "youngluv4everr-401fa.firebaseapp.com",
+      projectId: "youngluv4everr-401fa",
+      storageBucket: "youngluv4everr-401fa.firebasestorage.app",
+      messagingSenderId: "1029696388963",
+      appId: "1:1029696388963:web:9357728a2ba8e0fce0dd56",
+      measurementId: "G-RP91725T8M"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+
+    const db = getDatabase(app, "https://youngluv4everr-401fa-default-rtdb.asia-southeast1.firebasedatabase.app");
+
+    const lettersRef = ref(db, "letters");
+
+
+    const letterBox = document.getElementById("letter");
+    const sendBtn = document.getElementById("sendBtn");
+    const status = document.getElementById("status");
+    const letters = document.getElementById("letters");
+
+
+    sendBtn.addEventListener("click", async () => {
+
+      const message = letterBox.value.trim();
+
+      if (message === "") {
+        status.innerText = "Please write a letter first 🥺";
+        return;
+      }
+
+      try {
+
+        await push(lettersRef, {
+          message: message,
+          time: Date.now()
+        });
+
+        letterBox.value = "";
+        status.innerText = "Letter sent successfully 💌❤️";
+
+      } catch (error) {
+
+        console.error(error);
+        status.innerText = "Something went wrong 😭";
+
+      }
+
+    });
+
+
+    onValue(lettersRef, (snapshot) => {
+
+      letters.innerHTML = "";
+
+      snapshot.forEach((child) => {
+
+        const data = child.val();
+
+        const div = document.createElement("div");
+
+        div.className = "letter";
+
+        div.innerText = "💌 " + data.message;
+
+        letters.appendChild(div);
+
+      });
+
+    });
+
+  </script>
+
 </body>
 </html>
